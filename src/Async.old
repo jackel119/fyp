@@ -1,0 +1,40 @@
+module Async where
+
+import Lib
+import Control.Monad.Free
+
+-- Version 1, BAD
+-- Fork into two tasks, a and b
+-- data Async a b = Fork a b
+--             deriving Functor
+
+-- fork :: (Member (Async b) s) => Free s b -> Free s ()
+-- fork t = send $ Fork t (Pure ())
+
+
+-- Version 2
+-- Fork a computation with s effects with value a and continue with b
+-- data Async s a b = Fork (Free s a) b deriving Show
+
+-- Functor in b
+-- instance Functor (Async s a) where
+--   fmap f (Fork a b) = Fork a (f b)
+
+-- instance (Show s k, Show a, Show b) => Show (Async s a b) where
+--   show (Fork fsa b) = show fsa ++ " || " ++ show b
+
+-- fork :: (Member s r, Member (Async s b) r) => Free s b -> Free r ()
+-- fork t = send $ Fork t $ Pure ()
+
+
+-- data Forked a b = Forked (Forked a b) (Forked a b)
+--                 | PLeft a
+--                 | PRight b
+--                 deriving (Functor, Show)
+
+-- genAsync x = PRight x
+
+-- algAsync :: Async s a (Forked a b) -> Forked a b
+-- algAsync (Fork _ (Forked a b)) = Forked a b
+-- algAsync (Fork _ (PLeft a)) = PLeft a
+-- algAsync (Fork _ (PRight b)) = PRight b
