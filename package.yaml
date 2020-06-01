@@ -36,6 +36,8 @@ executables:
     dependencies:
     - fyp
     - free
+    - mtl
+    - async
     default-extensions:
       - TypeOperators
       - FlexibleInstances
@@ -52,6 +54,9 @@ executables:
       - ViewPatterns
       - OverlappingInstances
       - BangPatterns
+      - ConstraintKinds
+      - TypeFamilies
+      - ScopedTypeVariables
 
 tests:
   fyp-test:

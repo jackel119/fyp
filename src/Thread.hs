@@ -1,4 +1,4 @@
-module Async where
+module Thread where
 
 import Lib
 import Tell

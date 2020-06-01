@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6fc76a85b8d8e1b9820f7560e2eea38620401681063c65daaef5f63441f2fc93
+-- hash: adfa1160805583ee86ef002a7793651e48801c34fe2fa3348ac64ecd3813d51a
 
 name:           fyp
 version:        0.1.0.0
@@ -27,14 +27,19 @@ source-repository head
 
 library
   exposed-modules:
-      Async
+      A
+      AsyncAwait
       Console
+      Embed
       Exception
       Fail
+      Interrupts
       Lib
+      Nondet
       State
       Syntax
       Tell
+      Thread
   other-modules:
       Paths_fyp
   hs-source-dirs:
@@ -49,12 +54,14 @@ executable fyp-exe
       Paths_fyp
   hs-source-dirs:
       app
-  default-extensions: TypeOperators FlexibleInstances MultiParamTypeClasses GADTs DeriveFunctor FlexibleContexts IncoherentInstances AllowAmbiguousTypes DataKinds KindSignatures RankNTypes PatternSynonyms ViewPatterns OverlappingInstances BangPatterns
+  default-extensions: TypeOperators FlexibleInstances MultiParamTypeClasses GADTs DeriveFunctor FlexibleContexts IncoherentInstances AllowAmbiguousTypes DataKinds KindSignatures RankNTypes PatternSynonyms ViewPatterns OverlappingInstances BangPatterns ConstraintKinds TypeFamilies ScopedTypeVariables
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , free
     , fyp
+    , mtl
   default-language: Haskell2010
 
 test-suite fyp-test

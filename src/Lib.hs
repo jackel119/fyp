@@ -1,6 +1,8 @@
+{-# LANGUAGE ConstraintKinds #-}
 module Lib where
 
 import Control.Monad.Free
+import GHC.Exts (Constraint)
 
 -- Define Functor Coproduct
 data (f1 + f2) (m :: * -> *) a = Inl (f1 m a) | Inr (f2 m a)
@@ -62,6 +64,7 @@ instance Show (Void k) where
 runVoid :: Free Void a -> a
 runVoid (Pure x) = x
 
+
 class (Syntax r, Syntax s) => Member r s where
   inj :: r m a -> s m a
   proj :: s m a -> Maybe (r m a)
@@ -82,6 +85,15 @@ instance (Syntax a, Member r b)
   proj (Inr a) = proj a
   proj (Inl _) = Nothing
 
+-- Doesn't work!
+-- class (Syntax s) => Members (r :: [(* -> *) -> * -> *]) s
+-- instance (Syntax r, Member r s) => Members '[r] s
+-- instance (Member r s, Members rs s) => Members (r ': rs) s
+
+type family (Members rs s) :: Constraint where
+  Members '[] s = ()
+  Members (r ': rs) s = (Member r s, Members rs s)
+
 send :: (Member r s) => r (Prog s) a -> Prog s a
 send = Op . inj
 
@@ -101,5 +113,14 @@ instance Functor sig => Syntax (Lift sig) where
   handle c hdl (Lift op) = Lift $ fmap (\x -> hdl (fmap (const x) c)) op
 
 type HVoid = Lift Void
-run :: Prog HVoid a -> a
-run (Return x) = x
+-- run :: Prog HVoid a -> a
+-- run (Return x) = x
+
+-- translate :: (Liftable f g, Member g r ) => Prog (f + sig) x -> Prog r x
+-- translate (Return x) = Return x
+-- translate (Op (Inl op)) = Op (Inl $ lift $ emap translate _)
+
+translate :: (Syntax f, Syntax g) =>
+  (forall a m. f m a -> g m a) -> Prog f x -> Prog g x
+translate f (Return x) = Return x
+translate f (Op op) = Op $ f $ hmap (translate f) op
