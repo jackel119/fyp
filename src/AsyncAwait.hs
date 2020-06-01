@@ -3,6 +3,7 @@ module AsyncAwait where
 import Control.Concurrent.Async
 import Lib
 import Tell
+import Embed
 import Control.Monad
 
                     -- forall b. Fork' (n b) (Async b -> m (c a))
@@ -28,14 +29,26 @@ instance Syntax AsyncAwait where
   --   where
   --     f = hdl $ mb <$ c :: _
   --     g = (\x  :: Async b -> hdl $ fmap (const mb) c) :: _
-  handle c hdl (Fork' mb k) = Fork' (hdl $ fmap (const mb) c) _
-                                    -- ((\x -> hdl $ fmap (const x) c)
-                                    --   . k
-                                    -- )
+  handle c hdl (Fork' mb k) = Fork' (hdl $ fmap (const mb) c)
+                                    ((\x -> hdl $ fmap (const x) c)
+                                      . k . (undefined)
+                                    )
                                     -- (\x -> hdl $ fmap (const mb) c)
   handle c hdl (Await' p bma) = Await' p (\x -> hdl $ fmap (const (bma x)) c)
                   -- Await' (fmap (\mb -> hdl $ fmap (const mb) c) p)
                   --        (hdl . fmap bma)
 
+pattern Fork p q <- (project -> Just (Fork' p q))
+pattern Await p k <- (project -> Just (Await' p k))
+
 fork :: (Member AsyncAwait r) => Prog r a -> Prog r (Async a)
 fork p = send $ Fork' p return
+
+await :: (Member AsyncAwait r) => Async a -> Prog r a
+await p = send $ Await' p return
+
+-- runAsync :: (Syntax sig, Members '[Embed IO, sig] r)
+--           => Prog (AsyncAwait) a -> Prog r a
+-- runAsync (Return x) = Return x
+-- runAsync (Fork p q) = embed $ withAsync _
+-- runAsync (Await p k) = _

@@ -6,18 +6,22 @@ import Control.Monad
 
 data Thread m a = Yield' (m a)
                 | forall x. Fork' (m x) (m a)
+                | forall x. Await' (Promise x) (x -> m a)
 
 instance Functor m => Functor (Thread m) where
   fmap f (Yield' ma) = Yield' $ fmap f ma
   fmap f (Fork' mx ma) = Fork' mx $ fmap f ma
+  fmap f (Await' p k) = Await' p $ (fmap f . k)
 
 instance HFunctor Thread where
   hmap f (Yield' ma) = Yield' $ f ma
   hmap f (Fork' mx ma) = Fork' (f mx) (f ma)
+  hmap f (Await' p k) = Await' p $ (f . k)
 
 instance Syntax Thread where
   emap f (Yield' ma) = Yield' $ f ma
   emap f (Fork' mx ma) = Fork' mx $ f ma
+  emap f (Await' p k) = Await' p $ (f . k)
   handle c hdl (Yield' p) = Yield' $ hdl (fmap (const p) c)
   handle c hdl (Fork' d p) = Fork' (hdl (fmap (const d) c)) (hdl (fmap (const p) c))
 
