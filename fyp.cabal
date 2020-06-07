@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: adfa1160805583ee86ef002a7793651e48801c34fe2fa3348ac64ecd3813d51a
+-- hash: 4bb346b7194b22e1c873122a2c824e9a8e9b6e9186d4d1380a785b2a4072b1dd
 
 name:           fyp
 version:        0.1.0.0
@@ -27,13 +27,11 @@ source-repository head
 
 library
   exposed-modules:
-      A
       AsyncAwait
       Console
       Embed
       Exception
       Fail
-      Interrupts
       Lib
       Nondet
       State
@@ -54,11 +52,12 @@ executable fyp-exe
       Paths_fyp
   hs-source-dirs:
       app
-  default-extensions: TypeOperators FlexibleInstances MultiParamTypeClasses GADTs DeriveFunctor FlexibleContexts IncoherentInstances AllowAmbiguousTypes DataKinds KindSignatures RankNTypes PatternSynonyms ViewPatterns OverlappingInstances BangPatterns ConstraintKinds TypeFamilies ScopedTypeVariables
+  default-extensions: TypeOperators FlexibleInstances MultiParamTypeClasses GADTs DeriveFunctor FlexibleContexts IncoherentInstances AllowAmbiguousTypes DataKinds KindSignatures RankNTypes PatternSynonyms ViewPatterns OverlappingInstances BangPatterns ConstraintKinds TypeFamilies ScopedTypeVariables PartialTypeSignatures DeriveDataTypeable AutoDeriveTypeable StandaloneDeriving UndecidableInstances FunctionalDependencies
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       async
     , base >=4.7 && <5
+    , containers
     , free
     , fyp
     , mtl

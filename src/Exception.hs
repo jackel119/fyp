@@ -33,7 +33,7 @@ pattern Catch p h k <- (project -> Just (Catch' p h k))
 catch :: (Member (Except e) s) => Prog s a -> (e -> Prog s a) -> Prog s a
 catch p h = send (Catch' p h return)
 
-runException :: Syntax sig =>
+runException :: forall e sig a. Syntax sig =>
   Prog (Except e + sig) a -> Prog sig (Either e a)
 runException (Return x) = return (Right x)
 runException (Throw x) = return (Left x)
@@ -41,11 +41,11 @@ runException (Throw x) = return (Left x)
 --   r <- runException p
 --   case r of
 --       Left e -> do
---         r' <- runException (h e)
---         case r' of
---           Left e' -> return $ Left e'
+--         r <- runException (h e)
+--         case r of
+--           Left e -> return $ Left e
 --           Right a -> runException (k a)
---       Right x -> runException (k x)
--- runException (Other op) = Op $ handle (Right ()) hdl op
---   where
---     hdl = either (return . Left) runException
+--      Right x -> runException (k x)
+runException (Other op) = Op $ handle (Right ()) hdl op
+  where
+    hdl = either (return . Left) runException

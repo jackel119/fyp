@@ -38,6 +38,7 @@ executables:
     - free
     - mtl
     - async
+    - containers
     default-extensions:
       - TypeOperators
       - FlexibleInstances
@@ -57,6 +58,12 @@ executables:
       - ConstraintKinds
       - TypeFamilies
       - ScopedTypeVariables
+      - PartialTypeSignatures
+      - DeriveDataTypeable
+      - AutoDeriveTypeable
+      - StandaloneDeriving
+      - UndecidableInstances
+      - FunctionalDependencies
 
 tests:
   fyp-test:

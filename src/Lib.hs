@@ -11,10 +11,15 @@ data (f1 + f2) (m :: * -> *) a = Inl (f1 m a) | Inr (f2 m a)
 data Prog sig a = Return a
                 | Op (sig (Prog sig) a)
 
-instance Functor (Prog sig) where
-  fmap f (Return a) = Return $ f a
+-- deriving instance Functor (sig (Prog sig)) => Functor (Prog sig)
 
-instance Applicative (Prog sig) where
+-- deriving instance (Show a, Show (sig (Prog sig) a)) => Show (Prog sig a)
+
+instance Syntax sig => Functor (Prog sig) where
+  fmap f (Return a) = Return $ f a
+  fmap f (Op op) = Op $ emap (fmap f) op
+
+instance Syntax sig => Applicative (Prog sig) where
   pure = Return
   (<*>) = undefined
 
@@ -86,7 +91,8 @@ instance (Syntax a, Member r b)
   proj (Inl _) = Nothing
 
 -- Doesn't work!
--- class (Syntax s) => Members (r :: [(* -> *) -> * -> *]) s
+-- class (Syntax s) => Members (r :: [(* -> *) -> * -> *]) s -- | s -> r
+-- instance (Syntax s) => Members '[] s
 -- instance (Syntax r, Member r s) => Members '[r] s
 -- instance (Member r s, Members rs s) => Members (r ': rs) s
 
